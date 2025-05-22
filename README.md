@@ -8,6 +8,7 @@ An interpreter language that takes the file (for now)
 
 - Lexer (tokenizer)
   That converts code into tokens
+  
   Keywords
   - var
   - const
