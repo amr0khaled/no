@@ -3,7 +3,6 @@ package lexer
 import (
 	"lang/io"
 	"lang/token"
-	"strconv"
 	"strings"
 )
 
@@ -80,7 +79,7 @@ func Tokenize(lexs *[]Lex) *[]token.Statement {
 			token := &token.Token{
 				Type:   tok,
 				Lexeme: v,
-				Value:  GetValue(v),
+				Value:  token.GetValue(v),
 			}
 			AppendToken(&_tokens, token)
 		}
@@ -151,44 +150,3 @@ func (t *LexText) peekNext() string {
 
 func isEOC(s string) bool   { return s == ";" || s == "\n" }
 func isWhite(s string) bool { return s == " " || s == "\t" }
-
-// Utils for Literals
-
-func isInt(s string) bool {
-	_, e := strconv.Atoi(s)
-	if e == nil {
-		return true
-	}
-	return false
-}
-
-func isString(s string) bool {
-	l := len(s)
-	return (s[0] == '"' && s[l-1] == 0) || (s[0] == '\'' && s[l-1] == '\'')
-}
-
-func isUpperString(s string) bool {
-	return strings.ContainsAny(s, "ABCDEFGHIJKLMNOPQRSTUVWXYZ")
-}
-
-func isLowerString(s string) bool {
-	return strings.ContainsAny(s, "abcdefghijklmnopqrstuvwxyz")
-}
-
-func isFloat(s string) bool {
-	return isInt(s) && strings.Contains(s, ".")
-}
-
-func GetValue(s string) interface{} {
-	if isString(s) {
-		return string(s)
-	} else if isFloat(s) {
-		v, _ := strconv.ParseFloat(s, 64)
-		return float64(v)
-	} else if isInt(s) {
-		v, _ := strconv.Atoi(s)
-		return int(v)
-	} else {
-		return nil
-	}
-}
