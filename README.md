@@ -9,7 +9,7 @@ An interpreter language that takes the file (for now)
 - Lexer (tokenizer)
   That converts code into tokens
   
-  Keywords
+  Keywords:
   - var
   - const
 
@@ -22,9 +22,14 @@ An interpreter language that takes the file (for now)
 - Parser
   - Prase Declarations for variables and constants
 - AST
-  For now i have developed:
-  Program Node `ProgramNode`
-  Expression Node `ExprNode`
-  Declaration Node `DeclNode`
-  Literal Node `LitNode`
+    For now i have developed:
+  
+    Program Node `ProgramNode`
+  
+    Expression Node `ExprNode`
+  
+    Declaration Node `DeclNode`
+  
+    Literal Node `LitNode`
+  
   
