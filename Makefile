@@ -1,3 +1,5 @@
 default:
-	go build -C build .. && echo "---------" 
-	./build/lang ./build/index.no
+	go run . ./build/index.no
+
+build:
+	go build -C build .. 

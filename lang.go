@@ -11,7 +11,5 @@ func main() {
 	args := os.Args
 	file := args[1]
 	f := print.ReadFile(file)
-	for _, line := range f.Lines {
-		fmt.Println(ast.Lexer(line.Text))
-	}
+	fmt.Println(ast.Lexer(f))
 }
