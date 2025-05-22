@@ -4,6 +4,8 @@ import "strconv"
 
 type TokenType int
 
+type Statement []Token
+
 type Token struct {
 	Type   TokenType
 	Lexeme string

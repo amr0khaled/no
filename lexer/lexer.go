@@ -1,7 +1,6 @@
 package lexer
 
 import (
-	//"fmt"
 	"lang/io"
 	"lang/token"
 	"strconv"
@@ -33,7 +32,7 @@ var exprNum int = 0
 var exprs []Lex
 var offset int = 0
 
-func Lexer(file *print.File) *[][]token.Token {
+func Lexer(file *print.File) *[]token.Statement {
 	for _, fline := range file.Lines {
 		ResetCursor()
 		var expr []string
@@ -68,10 +67,10 @@ func Lexer(file *print.File) *[][]token.Token {
 	return s
 }
 
-func Tokenize(lexs *[]Lex) *[][]token.Token {
-	var tokens [][]token.Token
+func Tokenize(lexs *[]Lex) *[]token.Statement {
+	var tokens []token.Statement
 	for _, lex := range *lexs {
-		var _tokens []token.Token
+		var _tokens token.Statement
 		for _, v := range lex.Value {
 			tok := token.GetToken(v)
 			keyword := token.Tokenize(tok)
@@ -92,11 +91,11 @@ func Tokenize(lexs *[]Lex) *[][]token.Token {
 
 // Utils
 
-func AppendTokens(tokens *[][]token.Token, token *[]token.Token) {
-	*tokens = append(*tokens, *token)
+func AppendTokens(tokens *[]token.Statement, stmt *token.Statement) {
+	*tokens = append(*tokens, *stmt)
 }
 
-func AppendToken(tokens *[]token.Token, token *token.Token) {
+func AppendToken(tokens *token.Statement, token *token.Token) {
 	*tokens = append(*tokens, *token)
 }
 
@@ -156,11 +155,16 @@ func isWhite(s string) bool { return s == " " || s == "\t" }
 // Utils for Literals
 
 func isInt(s string) bool {
-	return strings.ContainsAny(s, "0123456789")
+	_, e := strconv.Atoi(s)
+	if e == nil {
+		return true
+	}
+	return false
 }
 
 func isString(s string) bool {
-	return isUpperString(s) || isLowerString(s)
+	l := len(s)
+	return (s[0] == '"' && s[l-1] == 0) || (s[0] == '\'' && s[l-1] == '\'')
 }
 
 func isUpperString(s string) bool {
@@ -184,7 +188,7 @@ func GetValue(s string) interface{} {
 	} else if isInt(s) {
 		v, _ := strconv.Atoi(s)
 		return int(v)
+	} else {
+		return nil
 	}
-	return nil
-
 }

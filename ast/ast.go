@@ -1,6 +1,7 @@
 package ast
 
 import (
+	"fmt"
 	"lang/token"
 )
 
@@ -56,64 +57,91 @@ import (
 // func (*TypeSpec) specNode() {}
 // func (*LitSpec) specNode()  {}
 
-const __expr = 0
+type NodeType int
+
 const (
-	NODE = __expr
-	LIT  = 1
-	EXPR = 2
+	NODE NodeType = iota
+	LIT
+	EXPR
+	DECL
+	PROG
 )
 
-type Node struct {
-	Level  int
-	Kind   token.TokenType
-	Lexeme string
-	Value  interface{}
-	Type   func() int
+type ASTNode interface {
+	Type() NodeType
+	String() string
 }
 
 type LitNode struct {
-	Node
+	Kind  token.TokenType
+	Raw   string
+	Value interface{}
+}
+
+func (*LitNode) Type() NodeType { return LIT }
+func (n *LitNode) String() string {
+	return fmt.Sprintf(
+		`Literal: {
+  Token: %v
+  NodeType: %v
+  Value: %v
+}`, token.Tokenize(n.Kind), n.Type(), n.Value)
 }
 
 type ExprNode struct {
-	Node
-	LNode *LitNode
-	RNode *LitNode
+	Kind  token.TokenType
+	LNode ASTNode
+	RNode ASTNode
 }
 
-func (n *Node) isExpr() bool { return n.Type() == EXPR }
-func (n *Node) isLit() bool  { return n.Type() == LIT }
-func (n *Node) isNode() bool { return n.Type() == NODE }
-
-func NewNode(t *token.Token) Node {
-	e := Node{}
-	e.Type = func() int { return NODE }
-	if t != nil {
-		e.Value = t.Value
-		e.Lexeme = t.Lexeme
-		e.Kind = t.Type
-	}
-	return e
+func (*ExprNode) Type() NodeType { return EXPR }
+func (n *ExprNode) String() string {
+	return fmt.Sprintf(
+		`Expression: {
+  Token: %v
+  NodeType: %v
+  LNode: %v
+  RNode: %v
+}`,
+		token.Tokenize(n.Kind), n.Type(), n.LNode.String(), n.RNode.String())
 }
 
-func Lit(t *token.Token) LitNode {
-	e := LitNode{}
-	e.Type = func() int { return LIT }
-	if t != nil {
-		e.Value = t.Value
-		e.Lexeme = t.Lexeme
-		e.Kind = t.Type
-	}
-	return e
+type DeclNode struct {
+	Level int
+	Kind  token.TokenType
+	Ident string
+	Value ASTNode
 }
 
-func Expr(t *token.Token) ExprNode {
-	e := ExprNode{}
-	e.Type = func() int { return EXPR }
-	if t != nil {
-		e.Value = t.Value
-		e.Lexeme = t.Lexeme
-		e.Kind = t.Type
+func (*DeclNode) Type() NodeType { return DECL }
+func (n *DeclNode) String() string {
+	return fmt.Sprintf(
+		`Declaration: {
+  Token: %v
+  NodeType: %v
+  Level: %v
+  Ident: %v
+  Value: %v
+}`, token.Tokenize(n.Kind), n.Type(), n.Level, n.Ident, "\t"+n.Value.String())
+}
+
+type ProgramNode struct {
+	Kind       token.TokenType
+	Statements []ASTNode
+}
+
+func (*ProgramNode) Type() NodeType { return PROG }
+
+func (n *ProgramNode) String() string {
+	var _strs string = "[\n"
+	for _, stat := range n.Statements {
+		_strs += "\t"
+		_strs += stat.String()
 	}
-	return e
+	_strs += "\n]\n"
+	return fmt.Sprintf(
+		`Program: {
+  Token: %v
+  Statements: %v
+}`, token.Tokenize(n.Kind), _strs)
 }
